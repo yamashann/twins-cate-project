@@ -1,0 +1,2 @@
+test,original_mean,original_sd,refuted_mean,refuted_sd
+cate_random_common_cause (mean RMSE vs original = 0.0355),-0.025020882529458947,0.16827651950967476,-0.025366027814032525,0.16771635544175212

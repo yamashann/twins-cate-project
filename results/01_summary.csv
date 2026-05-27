@@ -1,0 +1,10 @@
+metric,value
+n (observations),11984.0
+n pairs,11984.0
+d (covariates),50.0
+P(T=1),0.49666221628838453
+P(Y=1),0.1783210947930574
+P(Y=1 | T=1),0.1639784946236559
+P(Y=1 | T=0),0.192473474801061
+Naive diff (treated - control),-0.028494980177405094
+Within-pair ATE (ground truth),-0.02520026702269693
