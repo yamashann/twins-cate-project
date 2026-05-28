@@ -86,7 +86,7 @@ The CATE estimators agree on the average effect but disagree on how much heterog
 | Causal forest | -0.0242 | 0.0215 |
 | True ITE | -0.0252 | 0.3199 |
 
-To compare the spreads against something meaningful, I built a non-parametric lower bound on the true `sd[tau(X)]` by binning units into 50 bins ranked by causal forest prediction and taking the between-bin variance of the true ITE. That gives `sd[tau(X)] >= 0.079`. Against this benchmark, the S-learner (0.012) and causal forest (0.022) clearly under-disperse, T (0.062) and R (0.059) are closest to the bound, and DR (0.168) over-disperses badly — its spread is mostly noise. The true ITE sd of 0.32 is mechanically larger than any estimator's because each ITE lives in {-1, 0, +1}, so the right comparison is to the lower bound, not to the raw ITE sd.
+To compare the spreads against something meaningful, I built a non-parametric lower bound on the true `sd[tau(X)]` by binning units into 50 bins ranked by causal forest prediction and taking the between-bin variance of the true ITE. That gives `sd[tau(X)] >= 0.079`. Against this benchmark, the S-learner (0.012) and causal forest (0.022) clearly under-disperse, T (0.062) and R (0.059) are closest to the bound, and DR (0.168) over-disperses badly, as its spread is mostly noise. The true ITE sd of 0.32 is mechanically larger than any estimator's because each ITE lives in {-1, 0, +1}, so the right comparison is to the lower bound, not to the raw ITE sd.
 
 The causal forest has the best rank correlation with the true within-pair effects, but its CATE distribution is still much smoother than the raw ITE distribution. That is expected because individual binary outcomes contain a lot of noise. The right question is not whether the model reproduces every pair's observed difference, but whether it ranks and summarizes heterogeneity better than chance.
 
@@ -175,7 +175,7 @@ The best linear projection (BLP) gives the same warning. I regress the AIPW pseu
 | chyper | +0.112 [0.130] | +0.044 [0.097] |
 | preterm | -0.039 [0.369] | +0.031 [0.065] |
 
-AIPW flags `gestat10` as a significant modifier (p = 0.025), but the within-pair truth gives a coefficient that rounds to zero (p = 0.96). None of the truth p-values drop below 0.05. The practical conclusion is that I trust the ATE much more than the gestational-age heterogeneity claim — the AIPW BLP looks defensible on its own, with the right framework, valid robust SEs, and a sub-0.05 p-value, and only the design-based truth BLP reveals that the significant finding is spurious.
+AIPW flags `gestat10` as a significant modifier (p = 0.025), but the within-pair truth gives a coefficient that rounds to zero (p = 0.96). None of the truth p-values drop below 0.05. The practical conclusion is that I trust the ATE much more than the gestational-age heterogeneity claim. The AIPW BLP looks defensible on its own, with the right framework, valid robust SEs, and a sub-0.05 p-value, and only the design-based truth BLP reveals that the significant finding may not be necessarily true.
 
 ### 5.5 Causal Forest Outputs
 
@@ -199,7 +199,7 @@ The RATE curve asks whether units ranked as most protective by the causal forest
 
 The magnitude should not be over-interpreted because the DR pseudo-outcome can be very large when propensity scores are near the clipping boundary. The useful finding is the direction and shape of the curve, not the exact RATE value.
 
-CATE-level refutations tell a similar story. When treatment is permuted, the DR-learner's mean CATE moves from -0.0250 to -0.0019 and its spread falls sharply. Adding an irrelevant random covariate leaves the mean essentially unchanged. Subsample refits have a median pointwise SD of 0.0095. These checks suggest the CATE surface is not pure noise, even though some subgroup claims remain unstable.
+CATE-level refutations tell a similar story. When treatment is permuted, the DR-learner's mean CATE moves from -0.0250 to -0.0019, and its spread falls sharply. Adding an irrelevant random covariate leaves the mean essentially unchanged. Subsample refits have a median pointwise SD of 0.0095. These checks suggest the CATE surface is not pure noise, even though some subgroup claims remain unstable.
 
 ### 5.7 Sensitivity to an Unmeasured Confounder
 
@@ -227,11 +227,11 @@ The main causal conclusion is that, among same-sex twin pairs where both infants
 
 The heterogeneity results are more mixed. The causal forest provides the best CATE ranking, but the GATE and BLP checks show that some subgroup patterns, especially by gestational age, do not survive comparison with the within-pair benchmark. This is the central methodological lesson of the project: an estimator can recover the average effect well while still giving unreliable subgroup stories.
 
-If I were advising someone running a similar study — rare binary outcome, large observational sample, possible unobserved confounding — I would estimate the ATE with AIPW and report the influence-function SE, run at least one auxiliary estimator like outcome regression as a triangulation check, fit the CATE with a causal forest as the headline method plus at least one orthogonalized meta-learner as a cross-check, and never report subgroup analyses without either a design-based oracle like the Twins benchmark or explicit subgroup-level propensity diagnostics. The biggest single lesson here is that the AIPW ATE and AIPW subgroup effects can be trustworthy and untrustworthy on the same dataset, and nothing inside the AIPW machinery flags it — only an external benchmark does.
+If I were advising someone running a similar study that includes rare binary outcome, large observational sample, possible unobserved confounding, I would estimate the ATE with AIPW and report the influence-function SE, run at least one auxiliary estimator like outcome regression as a triangulation check, fit the CATE with a causal forest as the headline method plus at least one orthogonalized meta-learner as a cross-check, and never report subgroup analyses without either a design-based oracle like the Twins benchmark or explicit subgroup-level propensity diagnostics. The biggest single lesson here is that the AIPW ATE and AIPW subgroup effects can be trustworthy and untrustworthy on the same dataset, and nothing inside the AIPW machinery flags it, only an external benchmark does.
 
 The study has several limitations. The treatment is a within-pair contrast, not a direct policy intervention. The confounding is simulated, so the bias depends on the assignment rule. Unobserved factors such as placental position are not measured. The binary outcome limits heterogeneity signal, and the results apply only to same-sex twin pairs where both infants weigh under 2 kg.
 
-Future work should tune CATE hyperparameters using held-out R-loss or DR-score MSE, compare subgroup AIPW against TMLE, add subgroup-level propensity diagnostics, and study the original non-simulated assignment with a fixed-effects twin design. I would also extend the analysis to policy learning only after the subgroup instability is better understood.
+Future work should tune CATE hyperparameters using held-out R-loss or DR-score MSE. This is because current tuning optimizes nuisance prediction, but R-loss or DR-score MSE are losses that target CATE directly, so the model picks hyperparameters to minimize the causal error, not predictive error. This may fix our near-zero rank correlation seen earlier. Another is to compare subgroup AIPW as a correction against TMLE for stronger triangulation, which disagreement may reveal which estimator is breaking. The third is to add subgroup-level propensity diagnostics to show whether Q3's instability was from sparse positivity, rare outcome, or noisy nuisances. Lastly, future work should study the original non-simulated assignment with a fixed-effects twin design, which removes the stimulated confounding effects and provides a cleaner identification strategy than the simulated benchmark.
 
 ## 7. Code Repository
 

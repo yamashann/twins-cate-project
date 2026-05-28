@@ -183,7 +183,9 @@ add_bullets(s, [
     ("If confounded → resources better spent on maternal conditions", 1),
     "",
     "!My question: what's the causal effect of being the heavier twin on one-year mortality?",
-], top=1.3, size=20)
+    "",
+    "Roadmap: data & setup → identification & methods → ATE & CATE results → evaluation → limitations & takeaways",
+], top=1.3, size=18)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -264,19 +266,26 @@ add_callout(s,
 s = prs.slides.add_slide(BLANK)
 add_title(s, "Identification Assumptions")
 
-add_image(s, "02_dag.png", left=0.3, top=1.3, height=4.0)
+add_bullets(s, [
+    "Causal inference rests on assumptions you can't verify from the data alone.",
+    "I rely on four standard ones:",
+], top=1.05, size=17)
 
 add_bullets(s, [
-    "Conditional ignorability:  Y(0), Y(1) ⊥ T | X",
-    ("Holds by construction in the simulation", 1),
+    "Conditional ignorability:  once I condition on X, treatment is as-if-random",
+    ("Y(0), Y(1) ⊥ T | X", 1),
+    ("Holds by construction here — treatment was generated from X", 1),
     "",
-    "Positivity:  0 < P(T=1 | X) < 1",
-    ("Verified by overlap plot", 1),
+    "Positivity:  every covariate combination has a nonzero chance of either treatment",
+    ("0 < P(T=1 | X) < 1", 1),
+    ("Verified by the overlap plot in §2", 1),
     "",
-    "Consistency:  Y = T·Y(1) + (1−T)·Y(0)",
+    "Consistency:  the observed outcome equals the potential outcome under the assigned T",
+    ("Y = T·Y(1) + (1−T)·Y(0)", 1),
     "",
-    "SUTVA (pair-level):  within-pair contrast, not single-infant intervention",
-], left=6.5, top=1.3, size=16, width=6.5)
+    "SUTVA (pair-level):  treatment is a within-pair contrast — heavier vs. lighter",
+    ("Estimand is a pair-level comparison, not a single-infant intervention", 1),
+], top=2.05, size=15, width=12.3)
 
 add_callout(s,
     "Under (1)–(4):   τ = E[ μ_1(X) − μ_0(X) ]",
@@ -490,7 +499,31 @@ add_bullets(s, [
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# Slide 15 — Takeaways
+# Slide 15 — Limitations & Future Work
+# ────────────────────────────────────────────────────────────────────────────
+s = prs.slides.add_slide(BLANK)
+add_title(s, "Limitations & Future Work")
+
+add_bullets(s, [
+    "Limitations:",
+    ("Simulated confounding — bias my methods correct depends on my assignment rule", 1),
+    ("Unobserved pair-level factors (placental position) not in X — sensitivity grid quantifies but can't remove", 1),
+    ("Rare outcome (P(Y=1) = 0.18) limits heterogeneity signal — drives DR over-dispersion", 1),
+    ("Generalizability — results apply only to same-sex twin pairs where both infants weigh under 2 kg", 1),
+    ("Treatment is a within-pair contrast, not a free-standing policy intervention", 1),
+], top=1.1, size=16)
+
+add_bullets(s, [
+    "Future work:",
+    ("CV-tune CATE hyperparameters using held-out R-loss / DR-score MSE", 1),
+    ("Investigate the AIPW-vs-truth subgroup divergence — trim/stabilize subgroup propensities, compare against TMLE", 1),
+    ("Replicate on the real (non-simulated) assignment with a within-pair fixed-effects design", 1),
+    ("Policy learning — fit a policy tree on CATE outputs once subgroup stability is better understood", 1),
+], top=4.5, size=16)
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Slide 16 — Takeaways
 # ────────────────────────────────────────────────────────────────────────────
 s = prs.slides.add_slide(BLANK)
 add_title(s, "Takeaways")
